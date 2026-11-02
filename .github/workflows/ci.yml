@@ -21,6 +21,15 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Read version
+        id: version
+        shell: bash
+        run: |
+          set -euo pipefail
+          VERSION="$(tr -d '[:space:]' < VERSION)"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "asset=dist/ohmytaste-v$VERSION.zip" >> "$GITHUB_OUTPUT"
+
       - name: Repository checks
         run: python scripts/check_repo.py
 
@@ -28,7 +37,7 @@ jobs:
         run: python -m unittest discover -s tests -v
 
       - name: Build standalone skill ZIP
-        run: python scripts/package_skill.py --output dist/ohmytaste-v0.1.0-alpha.1.zip
+        run: python scripts/package_skill.py --output "${{ steps.version.outputs.asset }}"
 
       - name: Set up Node.js for skills CLI
         uses: actions/setup-node@v4
@@ -69,6 +78,6 @@ jobs:
       - name: Upload skill ZIP artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ohmytaste-v0.1.0-alpha.1
-          path: dist/ohmytaste-v0.1.0-alpha.1.zip
+          name: ohmytaste-v${{ steps.version.outputs.version }}
+          path: ${{ steps.version.outputs.asset }}
           if-no-files-found: error
