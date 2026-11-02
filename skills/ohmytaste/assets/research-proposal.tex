@@ -10,6 +10,8 @@
 \setlist{nosep}
 
 \newcommand{\ProjectTitle}{Research Proposal Title}
+\newcommand{\ScientificStatus}{OPEN / PARTIALLY OPEN / CLOSED / UNCERTAIN}
+\newcommand{\ProjectPriority}{PRIORITIZE / CONDITIONAL / DEPRIORITIZE}
 \newcommand{\Decision}{ACCEPT / REVISE}
 \newcommand{\EvidenceCaveat}{State material access limitations or write ``None known''.}
 
@@ -20,26 +22,34 @@
 \begin{document}
 \maketitle
 
-\noindent\textbf{Decision:} \Decision\\
+\noindent\textbf{Scientific Status:} \ScientificStatus\\
+\textbf{Project Priority:} \ProjectPriority\\
+\textbf{Workflow Decision:} \Decision\\
 \textbf{Material evidence caveat:} \EvidenceCaveat
 
 \section{Executive Summary}
-Summarize the research problem, proposed mechanism, decisive test, and expected contribution.
+Summarize the research problem, proposed mechanism, decisive test, scientific status, project priority, and expected contribution.
 
-\section{Research Background}
-Describe established facts and the local research context. Distinguish literature facts from synthesis.
+\section{Research Background and Scope}
+Describe established facts and the local research context. State the demonstrated scope of central results: task family, dataset/system, model class, loss, scale, and evaluation regime when relevant. Distinguish literature facts from synthesis.
 
-\section{Research Gap}
-State the unresolved relation, mechanism, assumption, or boundary condition. Explain why the gap survives the closest prior work.
+\section{Tension Map and Research Gap}
+State the unresolved relation, contradiction, dissociation, hidden assumption, boundary inversion, measurement failure, or underdetermined mechanism. Explain why the gap survives the closest prior work.
 
 \section{Closest Related Work}
-\begin{longtable}{p{0.22\linewidth}p{0.23\linewidth}p{0.23\linewidth}p{0.22\linewidth}}
+\begin{longtable}{p{0.17\linewidth}p{0.20\linewidth}p{0.19\linewidth}p{0.17\linewidth}p{0.17\linewidth}}
 \toprule
-Work & What it establishes & Difference from proposal & Evidence access \\
+Work & What it establishes & Difference from proposal & Evidence access/status & Collision status \\
 \midrule
-Closest paper & Established result & Decisive difference & full-text / partial / abstract-only \\
+Closest paper & Established result & Decisive difference & full-text / abstract-only; checked status & direct / strong risk / related \\
 \bottomrule
 \end{longtable}
+
+\section{Discovery Trace}
+Show how the candidate emerged from evidence:
+\begin{quote}
+Evidence A + Evidence B $\rightarrow$ tension or unexplained relation $\rightarrow$ missing causal distinction $\rightarrow$ hypothesis $\rightarrow$ discriminating prediction $\rightarrow$ minimal decisive experiment.
+\end{quote}
 
 \section{Proposed Hypothesis}
 State the hypothesis and underlying mechanism. Include a prediction that differs from the strongest alternative explanation.
@@ -66,7 +76,7 @@ State the smallest experiment that can materially change the project decision. I
 State the scientific claim that would remain after a successful experiment. Avoid relying solely on a metric improvement.
 
 \section{Risks and Alternative Explanations}
-Include the strongest prior-art threat, strongest alternative mechanism, feasibility risks, evaluation artifacts, and evidence-access limitations.
+Include the strongest prior-art threat, strongest alternative mechanism, feasibility risks, evaluation artifacts, competition/attribution risk, and evidence-access limitations. Keep scientific openness separate from project-strategy concerns.
 
 \section{References}
 List complete bibliographic references with DOI and/or arXiv identifiers when available. Do not invent missing metadata.
