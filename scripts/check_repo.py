@@ -15,13 +15,15 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 SKILL_DIR = ROOT / "skills" / "ohmytaste"
 SKILL_FILE = SKILL_DIR / "SKILL.md"
-EXPECTED_VERSION = "0.1.0-alpha.1"
+VERSION_FILE = ROOT / "VERSION"
+EXPECTED_VERSION = VERSION_FILE.read_text(encoding="utf-8").strip() if VERSION_FILE.is_file() else ""
 
 REQUIRED_FILES = [
     ROOT / "README.md",
     ROOT / "README.zh-CN.md",
     ROOT / "LICENSE",
     ROOT / "CHANGELOG.md",
+    VERSION_FILE,
     SKILL_FILE,
     SKILL_DIR / "references" / "evidence-and-search.md",
     SKILL_DIR / "references" / "taste-and-critique.md",
@@ -63,10 +65,15 @@ def run_checks(root: Path = ROOT) -> list[str]:
     errors: list[str] = []
     skill_dir = root / "skills" / "ohmytaste"
     skill_file = skill_dir / "SKILL.md"
+    version_file = root / "VERSION"
 
     for required in [root / p.relative_to(ROOT) for p in REQUIRED_FILES]:
         if not required.is_file():
             errors.append(f"Missing required file: {required.relative_to(root)}")
+
+    expected_version = version_file.read_text(encoding="utf-8").strip() if version_file.is_file() else ""
+    if not expected_version:
+        errors.append("VERSION must contain a non-empty version")
 
     if not skill_file.is_file():
         return errors
@@ -104,6 +111,19 @@ def run_checks(root: Path = ROOT) -> list[str]:
         if phase not in body:
             errors.append(f"SKILL.md missing {phase}")
 
+    for required_marker in [
+        "Scope Map",
+        "Tension Map",
+        "Unresolved-Question Ledger",
+        "Discovery Trace",
+        "Residual Opportunity Recovery",
+        "Scientific Status",
+        "Project Priority",
+        "STRONG_COLLISION_RISK",
+    ]:
+        if required_marker not in body:
+            errors.append(f"SKILL.md missing v0.1.1 discovery invariant: {required_marker}")
+
     for relative_ref in [
         "references/evidence-and-search.md",
         "references/taste-and-critique.md",
@@ -112,32 +132,41 @@ def run_checks(root: Path = ROOT) -> list[str]:
         if relative_ref not in text:
             errors.append(f"SKILL.md must reference {relative_ref}")
 
-    if 'version: "' + EXPECTED_VERSION + '"' not in text:
-        errors.append(f"SKILL.md metadata version must be {EXPECTED_VERSION}")
+    if expected_version and f'version: "{expected_version}"' not in text:
+        errors.append(f"SKILL.md metadata version must be {expected_version}")
 
     eval_file = root / "evals" / "test-cases.md"
     if eval_file.is_file():
         eval_text = eval_file.read_text(encoding="utf-8")
         case_count = len(re.findall(r"^## Case \d+", eval_text, flags=re.MULTILINE))
-        if case_count < 6:
-            errors.append(f"At least 6 eval cases are required; found {case_count}")
+        if case_count < 12:
+            errors.append(f"At least 12 eval cases are required; found {case_count}")
         pass_count = len(re.findall(r"^\*\*Pass criteria:\*\*", eval_text, flags=re.MULTILINE))
         fail_count = len(re.findall(r"^\*\*Failure criteria:\*\*", eval_text, flags=re.MULTILINE))
         if pass_count != case_count or fail_count != case_count:
             errors.append("Every eval case must include Pass criteria and Failure criteria")
+        for case_title in [
+            "Residual opportunity discovery",
+            "Unresolved-question closure",
+            "Abstract-only collision calibration",
+            "Scientific openness versus project priority",
+        ]:
+            if case_title not in eval_text:
+                errors.append(f"evals/test-cases.md missing required v0.1.1 case: {case_title}")
 
     changelog = root / "CHANGELOG.md"
-    if changelog.is_file() and EXPECTED_VERSION not in changelog.read_text(encoding="utf-8"):
-        errors.append(f"CHANGELOG.md must mention version {EXPECTED_VERSION}")
+    if changelog.is_file() and expected_version and expected_version not in changelog.read_text(encoding="utf-8"):
+        errors.append(f"CHANGELOG.md must mention version {expected_version}")
 
     template = skill_dir / "assets" / "research-proposal.tex"
     if template.is_file():
         template_text = template.read_text(encoding="utf-8")
         for section in [
             "Executive Summary",
-            "Research Background",
-            "Research Gap",
+            "Research Background and Scope",
+            "Tension Map and Research Gap",
             "Closest Related Work",
+            "Discovery Trace",
             "Proposed Hypothesis",
             "Proposed Method",
             "Experimental Design",
@@ -149,6 +178,9 @@ def run_checks(root: Path = ROOT) -> list[str]:
         ]:
             if f"\\section{{{section}}}" not in template_text:
                 errors.append(f"LaTeX template missing section: {section}")
+        for command in ["ScientificStatus", "ProjectPriority", "Decision"]:
+            if f"\\newcommand{{\\{command}}}" not in template_text:
+                errors.append(f"LaTeX template missing decision command: {command}")
 
     return errors
 
