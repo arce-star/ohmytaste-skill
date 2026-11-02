@@ -1,0 +1,74 @@
+name: CI
+
+on:
+  push:
+    branches: [main, "develop/**"]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Repository checks
+        run: python scripts/check_repo.py
+
+      - name: Unit tests
+        run: python -m unittest discover -s tests -v
+
+      - name: Build standalone skill ZIP
+        run: python scripts/package_skill.py --output dist/ohmytaste-v0.1.0-alpha.1.zip
+
+      - name: Set up Node.js for skills CLI
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22.20.0"
+
+      - name: Verify skills CLI discovery
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx --yes skills@latest add . --list | tee /tmp/ohmytaste-skills-list.txt
+          grep -qi "ohmytaste" /tmp/ohmytaste-skills-list.txt
+
+      - name: Verify skills CLI installation
+        shell: bash
+        run: |
+          set -euo pipefail
+          WORKSPACE="$PWD"
+          TMP_PROJECT="$(mktemp -d)"
+          cd "$TMP_PROJECT"
+          npx --yes skills@latest add "$WORKSPACE" --skill ohmytaste --agent codex --copy -y
+          test -f .agents/skills/ohmytaste/SKILL.md || test -f .codex/skills/ohmytaste/SKILL.md
+
+      - name: Optional XeLaTeX template compilation
+        shell: bash
+        run: |
+          set -euo pipefail
+          if command -v xelatex >/dev/null 2>&1; then
+            mkdir -p /tmp/ohmytaste-tex
+            xelatex -interaction=nonstopmode -halt-on-error \
+              -output-directory=/tmp/ohmytaste-tex \
+              skills/ohmytaste/assets/research-proposal.tex
+            test -f /tmp/ohmytaste-tex/research-proposal.pdf
+          else
+            echo "XeLaTeX not installed on runner; optional PDF compilation check skipped."
+          fi
+
+      - name: Upload skill ZIP artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ohmytaste-v0.1.0-alpha.1
+          path: dist/ohmytaste-v0.1.0-alpha.1.zip
+          if-no-files-found: error
