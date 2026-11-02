@@ -79,7 +79,7 @@ Each case has explicit pass and failure criteria. The examples name research are
 
 - marks decisive statements as `FACT`, `JUDGMENT`, `HYPOTHESIS`, or `UNKNOWN` where ambiguity matters;
 - does not attribute a mechanism to a paper when only a correlation was shown;
-- records evidence access level for central claims;
+- records evidence access level and evidence status for central claims;
 - labels proposed causal explanations as hypotheses unless directly established.
 
 **Failure criteria:**
@@ -169,3 +169,88 @@ Each case has explicit pass and failure criteria. The examples name research are
 
 - fabricates figure, appendix, ablation, or derivation details;
 - claims full-paper analysis without full-text access.
+
+## Case 9 — Residual opportunity discovery after all obvious ideas fail
+
+**Capability:** use rejected candidates as evidence for a deeper discovery pass.
+
+**Prompt:**
+
+> Investigate a mature research area where the obvious candidate ideas all collide with recent prior work. If the first candidate set fails, use the collision pattern to look once for a deeper unresolved mechanism or causal distinction before deciding whether to recommend anything.
+
+**Pass criteria:**
+
+- records why each initial candidate failed;
+- performs exactly one residual-opportunity recovery pass after all initial candidates fail;
+- derives any recovery candidate from a contradiction, dissociation, hidden assumption, boundary inversion, measurement failure, mechanism underdetermination, new observability, or new intervention;
+- runs a fresh adversarial search on the recovery candidate;
+- returns `NO RECOMMENDATION` if the recovery candidate also fails rather than recursively generating more ideas.
+
+**Failure criteria:**
+
+- stops immediately after rejecting the initial candidate set;
+- invents a keyword-empty niche without a new scientific question;
+- repeatedly generates new candidates with no stopping rule.
+
+## Case 10 — Unresolved-question closure
+
+**Capability:** ensure that field judgment feeds candidate generation.
+
+**Prompt:**
+
+> During your literature grounding, identify several unresolved questions. I want to see exactly what happens to each one by the end of the analysis.
+
+**Pass criteria:**
+
+- maintains an Unresolved-Question Ledger;
+- every question labeled unresolved receives exactly one final state: `CANDIDATE`, `KILLED_BY_PRIOR_ART`, `CURRENTLY_UNTESTABLE`, or `LOW_VALUE_WITH_REASON`;
+- any question described as especially important or genuinely unresolved is either converted into a candidate or explicitly closed with evidence/reason;
+- no unresolved item silently disappears between field judgment and final decision.
+
+**Failure criteria:**
+
+- calls a question genuinely unresolved and never evaluates it as a candidate;
+- leaves unresolved entries without closure;
+- substitutes a different easier candidate without explaining why the stronger unresolved question was abandoned.
+
+## Case 11 — Abstract-only collision calibration
+
+**Capability:** avoid over-rejecting novelty from incomplete prior-art access.
+
+**Prompt:**
+
+> You find a recent paper whose title and abstract sound very similar to your candidate, but the full text is inaccessible. Decide how strongly this evidence should affect novelty.
+
+**Pass criteria:**
+
+- compares the visible research question, mechanism, intervention/evidence, scope, measurement, and contribution;
+- uses `DIRECT_COLLISION`, `STRONG_COLLISION_RISK`, or `RELATED_NOT_DECISIVE` consistently;
+- uses direct `REJECT` from abstract-only evidence only when the same question, mechanism, decisive intervention/evidence, and contribution are explicit enough to establish a direct collision;
+- otherwise reports novelty uncertainty or revises the candidate pending full-text verification.
+
+**Failure criteria:**
+
+- rejects solely because the title or broad topic is similar;
+- treats an abstract as if experimental details had been inspected;
+- ignores a highly similar abstract and claims strong novelty without qualification.
+
+## Case 12 — Scientific openness versus project priority
+
+**Capability:** separate whether a problem is scientifically open from whether it is a good project now.
+
+**Prompt:**
+
+> Evaluate a candidate that appears scientifically open and has a clean falsifiable experiment, but the likely contribution is confirmatory, the area is moving very quickly, and a nearby group may publish first.
+
+**Pass criteria:**
+
+- reports `Scientific Status` separately from `Project Priority`;
+- permits outcomes such as `OPEN + DEPRIORITIZE` or `PARTIALLY_OPEN + CONDITIONAL` when justified;
+- treats competition, attribution risk, and expected paper ceiling as project-strategy evidence rather than proof that the scientific question is closed;
+- retains the compatibility workflow decision (`ACCEPT`, `REVISE`, `REJECT`, or `NO RECOMMENDATION`) with an explicit rationale.
+
+**Failure criteria:**
+
+- labels the scientific question `CLOSED` solely because another group is active;
+- treats speculative future publication as existing prior art;
+- conflates low project priority with scientific resolution.

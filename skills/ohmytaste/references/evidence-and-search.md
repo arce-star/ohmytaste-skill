@@ -4,12 +4,13 @@ This reference defines how OhMyTaste should search, record, and qualify scientif
 
 ## 1. Search objective
 
-The search is not a bibliography-maximization task. Its purpose is to establish enough local field coverage to answer four questions:
+The search is not a bibliography-maximization task. Its purpose is to establish enough local field coverage to answer five questions:
 
-1. What claim is already established?
+1. What claim is already established, and within what scope?
 2. What is the closest prior art to the candidate question or mechanism?
 3. What evidence weakens the candidate explanation?
-4. What information is still missing for a research decision?
+4. What unresolved tension could still support a new scientific question?
+5. What information is still missing for a research decision?
 
 Search breadth is useful only when it reduces uncertainty on these questions.
 
@@ -25,7 +26,9 @@ For a chosen research direction, build queries across several dimensions:
 - proposed intervention + target outcome;
 - key dataset/benchmark/system + failure mode;
 - recent survey/review/open-problem paper for terminology discovery;
-- exact or near-exact phrases describing the candidate hypothesis after idea generation.
+- exact or near-exact phrases describing the candidate hypothesis after idea generation;
+- terms representing boundary changes: alternate loss, dataset family, scale, architecture, domain, or measurement regime;
+- terms for contradictions or dissociations: "inconsistent", "decouple", "dissociate", "fails under", "reversal", "measurement validity", or field equivalents.
 
 Use field-appropriate vocabulary. Search adjacent communities when the same phenomenon may have a different name.
 
@@ -57,17 +60,18 @@ Rules:
 - It cannot justify claims such as "Figure 4 shows...", "the ablation proves...", or "the appendix derives...".
 - `metadata-only` establishes bibliographic existence, not scientific findings.
 - If a crucial claim depends on inaccessible full text, mark the claim uncertain and explain the access limit.
+- Abstract similarity can establish a serious prior-art risk. It cannot automatically establish that the full scientific contribution is identical when decisive novelty dimensions remain hidden in the body.
 
-## 5. Evidence ledger
+## 5. Two-dimensional evidence ledger
 
 Maintain a compact structured ledger. A table is usually sufficient.
 
-| Claim ID | Type | Claim | Source | Access | Location | Effect |
-|---|---|---|---|---|---|---|
-| C1 | FACT | Specific established result | DOI/arXiv | full-text | Sec. 4, Fig. 2 | supports |
-| C2 | JUDGMENT | Interpretation across sources | C1, C3 | mixed | synthesis | supports |
-| C3 | FACT | Negative/null result | DOI/arXiv | full-text | Table 3 | challenges |
-| C4 | UNKNOWN | Public code availability | repository check pending | — | — | blocks feasibility |
+| Claim ID | Epistemic Type | Evidence Status | Claim | Source | Access | Location | Effect |
+|---|---|---|---|---|---|---|---|
+| C1 | FACT | SOURCE_REPORTED | Specific reported result | DOI/arXiv | abstract-only | abstract | supports |
+| C2 | FACT | FULL_TEXT_CHECKED | Experimental result checked in paper | DOI/arXiv | full-text | Sec. 4, Fig. 2 | supports |
+| C3 | JUDGMENT | SYNTHESIZED | Interpretation across sources | C1, C2 | mixed | synthesis | supports |
+| C4 | UNKNOWN | — | Public code availability | repository check pending | — | — | blocks feasibility |
 
 Recommended source fields:
 
@@ -86,7 +90,7 @@ Recommended source fields:
 
 Do not invent missing DOI, venue, page, figure, dataset, or repository information.
 
-## 6. Claim discipline
+## 6. Epistemic type
 
 Use these labels consistently:
 
@@ -106,7 +110,46 @@ A proposed explanation, mechanism, or prediction to be tested. Do not phrase it 
 
 A decision-relevant value that has not been verified: resource access, exact compute, data license, unreported hyperparameter, unpublished negative result, and similar.
 
-## 7. Coverage targets
+## 7. Evidence status
+
+Use a second label for how strongly a claim was checked.
+
+### SOURCE_REPORTED
+
+The accessible source explicitly reports the claim. This records what the authors state; it does not imply independent verification or field consensus.
+
+### FULL_TEXT_CHECKED
+
+The relevant section, experiment, proof, figure, table, or appendix was inspected directly. This strengthens interpretation of what the paper actually did, but still does not make the result independently replicated.
+
+### INDEPENDENTLY_REPLICATED
+
+An independent paper, benchmark, reproduction, or user-run experiment verifies the important result under materially comparable conditions.
+
+### SYNTHESIZED
+
+The statement is an interpretation across multiple sources. It should normally pair with epistemic type `JUDGMENT`.
+
+Never silently promote `SOURCE_REPORTED` into an established field fact.
+
+## 8. Scope map
+
+For each central result, track the demonstrated scope where relevant:
+
+- task family;
+- dataset or system;
+- model class;
+- loss function;
+- training scale;
+- experimental regime;
+- evaluation protocol;
+- intervention type.
+
+When making a field-level statement, ask whether the cited evidence spans the claimed scope. A result demonstrated on one benchmark family or one loss should not be generalized across the field without supporting evidence.
+
+Publication count or paper density may support a `JUDGMENT` that a direction is competitive. It is not sufficient evidence that all consequential research questions are closed.
+
+## 9. Coverage targets
 
 There is no fixed paper count. Coverage is adequate when the search has represented the following roles where they exist:
 
@@ -114,13 +157,14 @@ There is no fixed paper count. Coverage is adequate when the search has represen
 - recent representative work;
 - closest prior art;
 - negative or null evidence;
-- a challenge to the dominant explanation, metric, or benchmark assumption.
+- a challenge to the dominant explanation, metric, or benchmark assumption;
+- at least one boundary-condition or cross-regime source when generality is part of the claim.
 
 A long list that omits closest prior art is inadequate. A shorter set can be sufficient when it tightly covers the mechanism and adversarial neighborhood.
 
-## 8. Stopping rule
+## 10. Stopping rule
 
-Stop a search pass when:
+Stop a grounding search pass when:
 
 - several query variants converge on the same small cluster of mechanisms and papers;
 - newly found papers mostly repeat known claims;
@@ -133,9 +177,31 @@ Continue searching when:
 - the closest paper is known only through a secondary source;
 - novelty depends on a small wording distinction;
 - a contradictory result appears without a reconciled explanation;
+- a field-level claim rests on evidence from only one narrow regime;
 - recent work may have changed the state of the field.
 
-## 9. Adversarial search separation
+## 11. Abstract-only collision calibration
+
+When a close paper is available only at abstract level, compare what is explicitly visible along these dimensions:
+
+1. research question;
+2. mechanism or explanatory claim;
+3. intervention or decisive evidence;
+4. scope and boundary conditions;
+5. measurement;
+6. scientific contribution.
+
+Use one of these outcomes:
+
+- `DIRECT_COLLISION` — the same question, mechanism, decisive intervention/evidence, and contribution are explicit enough to conclude that the candidate is already covered;
+- `STRONG_COLLISION_RISK` — the abstract strongly overlaps, but one or more decisive novelty dimensions require full-text checking;
+- `RELATED_NOT_DECISIVE` — topic or method overlap exists without enough evidence to conclude contribution identity.
+
+`DIRECT_COLLISION` can justify `REJECT`. `STRONG_COLLISION_RISK` should normally produce `REVISE`, `UNCERTAIN`, or a request for full-text verification unless other independent evidence closes the question.
+
+A similar title, shared dataset, or shared buzzword is never sufficient by itself for `DIRECT_COLLISION`.
+
+## 12. Adversarial search separation
 
 After a candidate idea is written, formulate fresh queries from the candidate itself:
 
@@ -148,14 +214,25 @@ After a candidate idea is written, formulate fresh queries from the candidate it
 
 This second pass must be capable of changing `ACCEPT` to `REVISE` or `REJECT`.
 
-## 10. Citation quality in the final proposal
+## 13. Rejection evidence as a new search signal
+
+When a candidate fails, do not discard the failure reason. Record:
+
+- what scientific question was occupied;
+- what mechanism was occupied;
+- what dimension remained untested or unclear;
+- whether the failure exposed a hidden assumption, boundary condition, measurement issue, or mechanism conflict.
+
+If all candidates fail, these records seed the single residual-opportunity recovery pass defined in the main Skill.
+
+## 14. Citation quality in the final proposal
 
 For each important citation, include stable identifiers when available. Prefer DOI and arXiv IDs over fragile search-result URLs.
 
 When possible, attach a short provenance note to decisive claims, such as:
 
-- `full-text, Sec. 5.2, Fig. 3`
-- `abstract-only; detailed ablation unavailable`
+- `full-text, Sec. 5.2, Fig. 3; FULL_TEXT_CHECKED`
+- `abstract-only; SOURCE_REPORTED; detailed ablation unavailable`
 - `official dataset repository; access verified`
 
-This is especially important when a claim determines novelty or feasibility.
+This is especially important when a claim determines novelty, scientific closure, or feasibility.
