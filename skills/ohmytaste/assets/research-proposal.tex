@@ -1,0 +1,74 @@
+\documentclass[11pt]{article}
+\usepackage[a4paper,margin=1in]{geometry}
+\usepackage{microtype}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{longtable}
+\hypersetup{colorlinks=true,linkcolor=black,urlcolor=blue,citecolor=black}
+\setlist{nosep}
+
+\newcommand{\ProjectTitle}{Research Proposal Title}
+\newcommand{\Decision}{ACCEPT / REVISE}
+\newcommand{\EvidenceCaveat}{State material access limitations or write ``None known''.}
+
+\title{\ProjectTitle}
+\author{Generated with the OhMyTaste research workflow}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\noindent\textbf{Decision:} \Decision\\
+\textbf{Material evidence caveat:} \EvidenceCaveat
+
+\section{Executive Summary}
+Summarize the research problem, proposed mechanism, decisive test, and expected contribution.
+
+\section{Research Background}
+Describe established facts and the local research context. Distinguish literature facts from synthesis.
+
+\section{Research Gap}
+State the unresolved relation, mechanism, assumption, or boundary condition. Explain why the gap survives the closest prior work.
+
+\section{Closest Related Work}
+\begin{longtable}{p{0.22\linewidth}p{0.23\linewidth}p{0.23\linewidth}p{0.22\linewidth}}
+\toprule
+Work & What it establishes & Difference from proposal & Evidence access \\
+\midrule
+Closest paper & Established result & Decisive difference & full-text / partial / abstract-only \\
+\bottomrule
+\end{longtable}
+
+\section{Proposed Hypothesis}
+State the hypothesis and underlying mechanism. Include a prediction that differs from the strongest alternative explanation.
+
+\section{Proposed Method}
+Describe the intervention, model, analysis, or theoretical method at the minimum level needed to test the mechanism.
+
+\section{Experimental Design}
+Specify data/system, controls, manipulated variables, measurements, repetitions, and analysis plan. Mark unresolved resource assumptions as \texttt{Unknown}.
+
+\section{Baselines and Metrics}
+List closest baselines, tuning requirements, primary metrics, negative controls, and any leakage or fairness checks.
+
+\section{Decisive First Experiment}
+State the smallest experiment that can materially change the project decision. Include:
+\begin{itemize}
+  \item proposed-mechanism prediction;
+  \item strongest-alternative prediction;
+  \item primary measurement;
+  \item explicit rejection or revision trigger.
+\end{itemize}
+
+\section{Expected Contributions}
+State the scientific claim that would remain after a successful experiment. Avoid relying solely on a metric improvement.
+
+\section{Risks and Alternative Explanations}
+Include the strongest prior-art threat, strongest alternative mechanism, feasibility risks, evaluation artifacts, and evidence-access limitations.
+
+\section{References}
+List complete bibliographic references with DOI and/or arXiv identifiers when available. Do not invent missing metadata.
+
+\end{document}
